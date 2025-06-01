@@ -10,6 +10,51 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
 </head>
 <body>
+    <!-- Welcome Modal -->
+    <div class="welcome-modal" id="welcome-modal">
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <h1 class="glitch" data-text="Juliette Psicose">Juliette Psicose</h1>
+                <h2 class="subtitle">Ecos da Rebelião</h2>
+            </div>
+            
+            <div class="welcome-body">
+                <div class="welcome-section">
+                    <h3>Sobre a Jornada</h3>
+                    <p>Mergulhe na mente fragmentada de Juliette, uma jovem revolucionária confinada em um asilo após descobrir segredos que ameaçavam desestabilizar o sistema de poder. Entre alucinações e revelações, você navegará pela tênue linha que separa loucura e clarividência.</p>
+                    <p>Inspirado na obra literária homônima, <em>Juliette Psicose</em> explora a jornada de uma heroína que questiona a realidade imposta e busca libertação através da consciência expandida.</p>
+                </div>
+                
+                <div class="welcome-section">
+                    <h3>Visões e Temas</h3>
+                    <p>Em um mundo onde a sanidade é definida pelos poderosos, Juliette enfrenta uma sociedade corrupta que silencia vozes dissidentes através do diagnóstico de loucura. Suas visões psíquicas revelam verdades ocultas enquanto ela navega por:</p>
+                    <ul>
+                        <li><span class="theme-item">Rebelião contra sistemas opressores</span></li>
+                        <li><span class="theme-item">Busca pela verdade interior e coletiva</span></li>
+                        <li><span class="theme-item">Amor como força libertadora e destrutiva</span></li>
+                        <li><span class="theme-item">Alucinação e lucidez como duas faces da consciência</span></li>
+                    </ul>
+                </div>
+                
+                <div class="welcome-section">
+                    <h3>Experiência Sensorial</h3>
+                    <p>Esta narrativa interativa combina elementos de:</p>
+                    <ul>
+                        <li>Estética visual poética com colagens digitais e glitch art</li>
+                        <li>Trilha sonora imersiva com vocais femininos, rock melódico e jazz distorcido</li>
+                        <li>Escolhas morais que afetam o destino de Juliette e da cidade</li>
+                        <li>Interações com símbolos místicos e testes de percepção extrassensorial</li>
+                    </ul>
+                    <p class="quote">"No abismo entre delírio e clareza, encontrei a verdade que não podia ser dita. Agora, resta-me reescrever a história com as palavras da minha própria consciência."</p>
+                </div>
+            </div>
+            
+            <div class="welcome-footer">
+                <button id="welcome-continue" class="welcome-button">Iniciar Jornada</button>
+            </div>
+        </div>
+    </div>
+
     <div class="loading-screen" id="loading-screen">
         <div class="loading-content">
             <h1 class="glitch" data-text="Juliette Psicose">Juliette Psicose</h1>
@@ -57,10 +102,25 @@
     <script src="js/game.js"></script>
 
     <script>
-        // Loading animation
+        // Welcome modal and loading animation
         window.addEventListener('load', function() {
+            const welcomeModal = document.getElementById('welcome-modal');
+            const welcomeContinue = document.getElementById('welcome-continue');
             const loadingBar = document.getElementById('loading-bar');
             const loadingScreen = document.getElementById('loading-screen');
+            
+            // Handle welcome modal continue button
+            welcomeContinue.addEventListener('click', function() {
+                welcomeModal.classList.add('fade-out');
+                setTimeout(() => {
+                    welcomeModal.style.display = 'none';
+                    // Now show the loading screen
+                    loadingScreen.style.display = 'flex';
+                }, 1000);
+            });
+            
+            // Initially hide the loading screen until welcome modal is closed
+            loadingScreen.style.display = 'none';
             
             let progress = 0;
             const interval = setInterval(() => {
@@ -80,6 +140,17 @@
                 loadingBar.style.width = progress + '%';
             }, 200);
 
+            // Text-to-speech for welcome screen
+            if (window.speechSynthesis) {
+                welcomeContinue.addEventListener('mouseover', function() {
+                    const welcomeText = new SpeechSynthesisUtterance("Iniciar Jornada");
+                    welcomeText.lang = 'pt-BR';
+                    welcomeText.volume = 0.8;
+                    welcomeText.rate = 0.9;
+                    speechSynthesis.speak(welcomeText);
+                });
+            }
+            
             // Music toggle
             const musicToggle = document.getElementById('music-toggle');
             musicToggle.addEventListener('click', function() {

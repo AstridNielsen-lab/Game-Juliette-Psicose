@@ -27,6 +27,223 @@ body {
     position: relative;
 }
 
+/* Welcome Modal */
+.welcome-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    overflow-y: auto;
+    transition: opacity 1s ease;
+}
+
+.welcome-content {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    background-color: var(--secondary-dark);
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 30px rgba(158, 30, 99, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) var(--primary-dark);
+    position: relative;
+}
+
+.welcome-header {
+    padding: 30px 20px;
+    text-align: center;
+    background: linear-gradient(to bottom, var(--primary-dark), var(--secondary-dark));
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.welcome-header h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+    font-family: 'Poetica', 'Georgia', serif;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px var(--shadow-color);
+}
+
+.welcome-header .subtitle {
+    font-size: 1.5rem;
+    color: var(--highlight-color);
+    margin-bottom: 1rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+}
+
+.welcome-body {
+    padding: 20px 30px;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.welcome-section {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.welcome-section h3 {
+    color: var(--highlight-color);
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-family: 'Poetica', 'Georgia', serif;
+    border-left: 3px solid var(--accent-color);
+    padding-left: 10px;
+}
+
+.welcome-section p {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.welcome-section ul {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.welcome-section ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+}
+
+.welcome-section ul li:before {
+    content: '•';
+    color: var(--accent-color);
+    font-size: 1.2em;
+    position: absolute;
+    left: 0;
+    top: -2px;
+}
+
+.theme-item {
+    font-style: italic;
+    color: var(--highlight-color);
+}
+
+.quote {
+    font-style: italic;
+    color: var(--highlight-color);
+    border-left: 2px solid var(--accent-color);
+    padding: 10px 20px;
+    margin: 20px 0;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.quote:before, .quote:after {
+    content: '"';
+    font-size: 2rem;
+    color: var(--accent-color);
+    opacity: 0.5;
+    position: absolute;
+}
+
+.quote:before {
+    top: -10px;
+    left: 5px;
+}
+
+.quote:after {
+    bottom: -10px;
+    right: 5px;
+}
+
+.welcome-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(158, 30, 99, 0.3);
+}
+
+.welcome-button {
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    font-family: 'Poetica', 'Georgia', serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-button:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+}
+
+.welcome-button:hover:before {
+    left: 100%;
+}
+
+.welcome-button:hover {
+    background-color: #b52d75;
+    box-shadow: 0 0 15px rgba(158, 30, 99, 0.5);
+}
+
+/* Welcome modal text animation */
+@keyframes text-reveal {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-section p, .welcome-section ul, .welcome-section h3 {
+    animation: text-reveal 0.8s ease forwards;
+    opacity: 0;
+}
+
+.welcome-section:nth-child(1) * { animation-delay: 0.2s; }
+.welcome-section:nth-child(2) * { animation-delay: 0.4s; }
+.welcome-section:nth-child(3) * { animation-delay: 0.6s; }
+
+/* Welcome modal fade out */
+.welcome-modal.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .welcome-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .welcome-header h1 {
+        font-size: 2rem;
+    }
+    
+    .welcome-header .subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-section h3 {
+        font-size: 1.3rem;
+    }
+    
+    .welcome-body {
+        padding: 15px;
+    }
+}
+
 /* Loading Screen */
 .loading-screen {
     position: fixed;
