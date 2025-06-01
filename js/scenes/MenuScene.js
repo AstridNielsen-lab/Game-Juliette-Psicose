@@ -36,6 +36,13 @@ class MenuScene extends Phaser.Scene {
         // Initialize the sound manager
         this.soundManager = Object.create(SoundManager).init(this);
         
+        // Initialize AI Chat
+        this.aiChat = new AIChat(this, {
+            visible: false,
+            x: this.cameras.main.width / 2,
+            y: this.cameras.main.height / 2
+        });
+        
         // Show welcome card with text-to-speech if player has a saved name
         if (localStorage.getItem('juliettePsicose_playerName')) {
             const playerName = localStorage.getItem('juliettePsicose_playerName');
@@ -143,10 +150,13 @@ class MenuScene extends Phaser.Scene {
             0x9e1e63
         ).setAlpha(0.8).setDepth(-1);
         
+        // Create button container for better organization
+        this.buttonContainer = this.add.container(0, 0);
+        
         // Add start button
         const startButton = this.add.rectangle(
             this.cameras.main.width / 2,
-            600,
+            520,
             250,
             60,
             0x9e1e63
@@ -154,13 +164,60 @@ class MenuScene extends Phaser.Scene {
         
         const startText = this.add.text(
             this.cameras.main.width / 2,
-            600,
+            520,
             'Começar a Jornada',
             {
                 font: '24px Georgia',
                 fill: '#ffffff'
             }
         ).setOrigin(0.5);
+        
+        this.buttonContainer.add(startButton);
+        this.buttonContainer.add(startText);
+        
+        // Add story button
+        const storyButton = this.add.rectangle(
+            this.cameras.main.width / 2,
+            590,
+            250,
+            60,
+            0x7b1fa2
+        ).setInteractive({ useHandCursor: true });
+        
+        const storyText = this.add.text(
+            this.cameras.main.width / 2,
+            590,
+            'História do Jogo',
+            {
+                font: '24px Georgia',
+                fill: '#ffffff'
+            }
+        ).setOrigin(0.5);
+        
+        this.buttonContainer.add(storyButton);
+        this.buttonContainer.add(storyText);
+        
+        // Add AI Chat button
+        const chatButton = this.add.rectangle(
+            this.cameras.main.width / 2,
+            660,
+            250,
+            60,
+            0x512da8
+        ).setInteractive({ useHandCursor: true });
+        
+        const chatText = this.add.text(
+            this.cameras.main.width / 2,
+            660,
+            'Assistente de IA',
+            {
+                font: '24px Georgia',
+                fill: '#ffffff'
+            }
+        ).setOrigin(0.5);
+        
+        this.buttonContainer.add(chatButton);
+        this.buttonContainer.add(chatText);
         
         // Button events
         startButton.on('pointerover', () => {
@@ -184,6 +241,48 @@ class MenuScene extends Phaser.Scene {
                     this.scene.start('Chapter1Scene');
                 }
             });
+        });
+        
+        // Story button events
+        storyButton.on('pointerover', () => {
+            storyButton.fillColor = 0x9c27b0;
+            storyText.setScale(1.05);
+        });
+        
+        storyButton.on('pointerout', () => {
+            storyButton.fillColor = 0x7b1fa2;
+            storyText.setScale(1);
+        });
+        
+        storyButton.on('pointerdown', () => {
+            // Play click sound
+            // this.sound.play('click');
+            
+            // Transition to story scene
+            this.cameras.main.fade(1000, 0, 0, 0, false, (camera, progress) => {
+                if (progress === 1) {
+                    this.scene.start('StoryScene');
+                }
+            });
+        });
+        
+        // Chat button events
+        chatButton.on('pointerover', () => {
+            chatButton.fillColor = 0x673ab7;
+            chatText.setScale(1.05);
+        });
+        
+        chatButton.on('pointerout', () => {
+            chatButton.fillColor = 0x512da8;
+            chatText.setScale(1);
+        });
+        
+        chatButton.on('pointerdown', () => {
+            // Play click sound
+            // this.sound.play('click');
+            
+            // Open AI Chat interface
+            this.toggleAIChat();
         });
         
         // Add credits button
@@ -247,6 +346,11 @@ class MenuScene extends Phaser.Scene {
                 }
             });
         }
+    }
+    
+    toggleAIChat() {
+        // Toggle AI Chat visibility
+        this.aiChat.toggle();
     }
     
     showCredits() {

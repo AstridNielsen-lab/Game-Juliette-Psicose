@@ -11,7 +11,7 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [NameInputScene, MenuScene, Chapter1Scene],
+    scene: [NameInputScene, MenuScene, StoryScene, Chapter1Scene],
     physics: {
         default: 'arcade',
         arcade: {
