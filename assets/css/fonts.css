@@ -1,0 +1,37 @@
+/* Custom Fonts for Juliette Psicose */
+
+@font-face {
+    font-family: 'Poetica';
+    src: url('../fonts/poetica.woff2') format('woff2'),
+         url('../fonts/poetica.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Dystopian';
+    src: url('../fonts/dystopian.woff2') format('woff2'),
+         url('../fonts/dystopian.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Fallback font loading */
+body {
+    font-family: 'Georgia', serif;
+}
+
+.font-loaded-poetica body {
+    font-family: 'Poetica', 'Georgia', serif;
+}
+
+.font-loaded-dystopian .dialog-text {
+    font-family: 'Dystopian', 'Courier New', monospace;
+}
+
+/* Note: Since actual font files are not available in this implementation,
+   we're using system fonts as fallbacks. In a real implementation,
+   you would provide the actual font files in the assets/fonts directory. */
+

@@ -1,0 +1,253 @@
+/* Main Styling for Juliette Psicose Game */
+
+:root {
+    --primary-dark: #0a0a0a;
+    --secondary-dark: #1a1a1a;
+    --accent-color: #9e1e63;
+    --text-color: #f0f0f0;
+    --highlight-color: #b39ddb;
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --glitch-color-1: #0ff;
+    --glitch-color-2: #f0f;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poetica', 'Courier New', monospace;
+    background-color: var(--primary-dark);
+    color: var(--text-color);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-dark);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 1s ease;
+}
+
+.loading-screen.fade-out {
+    opacity: 0;
+}
+
+.loading-content {
+    text-align: center;
+    width: 80%;
+    max-width: 600px;
+}
+
+.loading-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+    font-family: 'Poetica', 'Georgia', serif;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px var(--shadow-color);
+}
+
+.loading-content .subtitle {
+    font-size: 1.5rem;
+    color: var(--highlight-color);
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: var(--secondary-dark);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+.loading-quote {
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+/* Game Container */
+.game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#game {
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Controls */
+.controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+}
+
+.control-button {
+    background-color: rgba(30, 30, 30, 0.7);
+    border: 1px solid var(--accent-color);
+    color: var(--text-color);
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.control-button:hover {
+    background-color: rgba(60, 60, 60, 0.7);
+}
+
+.control-button .icon {
+    margin-right: 5px;
+    font-size: 1.2rem;
+}
+
+.control-button.muted {
+    border-color: #666;
+    color: #888;
+}
+
+/* Glitch Effect */
+.glitch {
+    position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -1px 0 var(--glitch-color-1);
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim-1 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: -1px 0 var(--glitch-color-2);
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim-2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip: rect(44px, 450px, 56px, 0); }
+    5% { clip: rect(30px, 450px, 44px, 0); }
+    10% { clip: rect(85px, 450px, 59px, 0); }
+    15% { clip: rect(32px, 450px, 26px, 0); }
+    20% { clip: rect(16px, 450px, 78px, 0); }
+    25% { clip: rect(5px, 450px, 14px, 0); }
+    30% { clip: rect(94px, 450px, 59px, 0); }
+    35% { clip: rect(99px, 450px, 44px, 0); }
+    40% { clip: rect(53px, 450px, 53px, 0); }
+    45% { clip: rect(22px, 450px, 31px, 0); }
+    50% { clip: rect(86px, 450px, 92px, 0); }
+    55% { clip: rect(8px, 450px, 81px, 0); }
+    60% { clip: rect(66px, 450px, 38px, 0); }
+    65% { clip: rect(43px, 450px, 65px, 0); }
+    70% { clip: rect(76px, 450px, 78px, 0); }
+    75% { clip: rect(81px, 450px, 72px, 0); }
+    80% { clip: rect(15px, 450px, 23px, 0); }
+    85% { clip: rect(82px, 450px, 40px, 0); }
+    90% { clip: rect(72px, 450px, 55px, 0); }
+    95% { clip: rect(25px, 450px, 55px, 0); }
+    100% { clip: rect(93px, 450px, 58px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip: rect(12px, 450px, 42px, 0); }
+    5% { clip: rect(24px, 450px, 32px, 0); }
+    10% { clip: rect(35px, 450px, 49px, 0); }
+    15% { clip: rect(22px, 450px, 16px, 0); }
+    20% { clip: rect(26px, 450px, 68px, 0); }
+    25% { clip: rect(15px, 450px, 24px, 0); }
+    30% { clip: rect(54px, 450px, 19px, 0); }
+    35% { clip: rect(59px, 450px, 34px, 0); }
+    40% { clip: rect(13px, 450px, 43px, 0); }
+    45% { clip: rect(12px, 450px, 21px, 0); }
+    50% { clip: rect(46px, 450px, 42px, 0); }
+    55% { clip: rect(18px, 450px, 71px, 0); }
+    60% { clip: rect(46px, 450px, 18px, 0); }
+    65% { clip: rect(13px, 450px, 35px, 0); }
+    70% { clip: rect(56px, 450px, 48px, 0); }
+    75% { clip: rect(21px, 450px, 32px, 0); }
+    80% { clip: rect(35px, 450px, 43px, 0); }
+    85% { clip: rect(32px, 450px, 20px, 0); }
+    90% { clip: rect(32px, 450px, 15px, 0); }
+    95% { clip: rect(35px, 450px, 25px, 0); }
+    100% { clip: rect(33px, 450px, 38px, 0); }
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .loading-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .loading-content .subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .loading-quote {
+        font-size: 0.9rem;
+    }
+    
+    .control-button .label {
+        display: none;
+    }
+    
+    .control-button .icon {
+        margin-right: 0;
+    }
+}
+

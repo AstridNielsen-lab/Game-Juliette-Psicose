@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juliette Psicose: Ecos da Rebelião</title>
+    <link rel="stylesheet" href="assets/css/fonts.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- Phaser.js -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <h1 class="glitch" data-text="Juliette Psicose">Juliette Psicose</h1>
+            <h2 class="subtitle">Ecos da Rebelião</h2>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loading-bar"></div>
+            </div>
+            <p class="loading-quote">"No abismo entre alucinação e lucidez, encontrei a verdade..."</p>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div id="game"></div>
+        <div class="controls">
+            <button id="music-toggle" class="control-button">
+                <span class="icon">♪</span>
+                <span class="label">Música</span>
+            </button>
+            <button id="fullscreen-toggle" class="control-button">
+                <span class="icon">⛶</span>
+                <span class="label">Tela Cheia</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/scenes/MenuScene.js"></script>
+    <script src="js/scenes/Chapter1Scene.js"></script>
+    <script src="js/game.js"></script>
+
+    <script>
+        // Loading animation
+        window.addEventListener('load', function() {
+            const loadingBar = document.getElementById('loading-bar');
+            const loadingScreen = document.getElementById('loading-screen');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        loadingScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 1000);
+                    }, 500);
+                }
+                
+                loadingBar.style.width = progress + '%';
+            }, 200);
+
+            // Music toggle
+            const musicToggle = document.getElementById('music-toggle');
+            musicToggle.addEventListener('click', function() {
+                if (window.game && window.game.sound) {
+                    if (window.game.sound.mute) {
+                        window.game.sound.mute = false;
+                        musicToggle.classList.remove('muted');
+                    } else {
+                        window.game.sound.mute = true;
+                        musicToggle.classList.add('muted');
+                    }
+                }
+            });
+
+            // Fullscreen toggle
+            const fullscreenToggle = document.getElementById('fullscreen-toggle');
+            fullscreenToggle.addEventListener('click', function() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
