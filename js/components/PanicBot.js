@@ -88,61 +88,44 @@ class PanicBot {
         // Choose a random message
         const message = Phaser.Utils.Array.GetRandom(this.messages);
         
-        // Create text object
-        this.currentMessageObject = this.scene.add.text(
-            this.options.messageX,
-            this.options.messageY,
-            message,
-            {
-                fontFamily: this.options.fontFamily,
-                fontSize: `${this.options.fontSize}px`,
-                fill: this.options.textColor,
-                stroke: this.options.strokeColor,
-                strokeThickness: this.options.strokeWidth,
-                fontStyle: 'italic'
-            }
-        ).setOrigin(0.5).setAlpha(0).setDepth(100);
+        // Use MessageCard component instead of plain text
+        this.messageCard = new MessageCard(this.scene, {
+            x: this.options.messageX,
+            y: this.options.messageY,
+            width: 500,
+            height: 80,
+            backgroundColor: 0x330000,
+            borderColor: 0xff0000,
+            fontFamily: this.options.fontFamily,
+            fontSize: this.options.fontSize,
+            fontColor: this.options.textColor,
+            strokeColor: this.options.strokeColor,
+            strokeThickness: this.options.strokeWidth,
+            duration: this.options.messageTime,
+            fadeInTime: this.options.fadeTime,
+            fadeOutTime: this.options.fadeTime,
+            glitchEffect: this.options.glitchEffect,
+            speakText: true,
+            speakOptions: {
+                rate: 1.1,  // Slightly faster speech for panic effect
+                pitch: 1.2, // Higher pitch for more stress
+                volume: 0.8
+            },
+            style: 'danger',
+            onHide: () => {
+                // Schedule next message
+                this.scheduleNextMessage();
+            },
+            autoDestroy: true
+        });
+        
+        // Show the message
+        this.messageCard.show(message);
         
         // Play sound if provided
         if (this.options.soundEffect) {
             this.scene.sound.play(this.options.soundEffect, { volume: 0.7 });
         }
-        
-        // Apply glitch effect if enabled
-        if (this.options.glitchEffect) {
-            this.scene.time.delayedCall(this.options.fadeTime, () => {
-                VisualEffects.applyGlitch(this.scene, this.currentMessageObject, 1, 500);
-            });
-        }
-        
-        // Animation sequence
-        this.scene.tweens.add({
-            targets: this.currentMessageObject,
-            alpha: 1,
-            duration: this.options.fadeTime,
-            ease: 'Power2',
-            onComplete: () => {
-                // Hold the message
-                this.scene.time.delayedCall(this.options.messageTime, () => {
-                    // Fade out
-                    this.scene.tweens.add({
-                        targets: this.currentMessageObject,
-                        alpha: 0,
-                        duration: this.options.fadeTime,
-                        ease: 'Power2',
-                        onComplete: () => {
-                            if (this.currentMessageObject) {
-                                this.currentMessageObject.destroy();
-                                this.currentMessageObject = null;
-                            }
-                            
-                            // Schedule next message
-                            this.scheduleNextMessage();
-                        }
-                    });
-                });
-            }
-        });
     }
     
     // Add a custom message to the list

@@ -36,6 +36,17 @@ const gameState = {
 
 // Initialize the game
 window.addEventListener('load', function() {
+    // Initialize Text-to-Speech Manager
+    window.ttsManager = new TextToSpeechManager({
+        enabled: localStorage.getItem('juliettePsicose_ttsEnabled') !== 'false', // Default to true
+        rate: 0.9,
+        pitch: 0.9,
+        lang: 'pt-BR',
+        onNoSupport: () => {
+            console.warn('Text-to-speech not supported in this browser');
+        }
+    });
+    
     // Load game background music
     const loadBackgroundMusic = () => {
         // A haunting soundtrack from Pixabay

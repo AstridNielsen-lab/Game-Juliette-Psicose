@@ -36,6 +36,24 @@ class MenuScene extends Phaser.Scene {
         // Initialize the sound manager
         this.soundManager = Object.create(SoundManager).init(this);
         
+        // Show welcome card with text-to-speech if player has a saved name
+        if (localStorage.getItem('juliettePsicose_playerName')) {
+            const playerName = localStorage.getItem('juliettePsicose_playerName');
+            
+            // Show welcome card with text-to-speech
+            const welcomeCard = new MessageCard(this, {
+                y: 100,
+                style: 'info',
+                duration: 5000,
+                speakText: true,
+                speakOptions: {
+                    rate: 0.9,
+                    pitch: 1.0
+                }
+            });
+            welcomeCard.show(`Bem-vindo(a) de volta, ${playerName}...`);
+        }
+        
         // Create background (placeholder in this demo)
         const bg = this.add.rectangle(
             this.cameras.main.width / 2,
@@ -83,18 +101,30 @@ class MenuScene extends Phaser.Scene {
             loop: true
         });
         
-        // Add a quote
-        const quoteText = this.add.text(
-            this.cameras.main.width / 2,
-            300,
-            '"Entre visões e espelhos quebrados,\nencontra-se a verdade além do véu."',
-            {
-                font: '24px Georgia',
-                fill: '#f0f0f0',
-                fontStyle: 'italic',
-                align: 'center'
-            }
-        ).setOrigin(0.5);
+        // Add a quote with text-to-speech
+        const quote = '"Entre visões e espelhos quebrados,\nencontra-se a verdade além do véu."';
+        
+        // Display quote in a card that reads it aloud
+        const quoteCard = new MessageCard(this, {
+            y: 300,
+            width: 600,
+            height: 100,
+            backgroundColor: 0x000000,
+            backgroundAlpha: 0.5,
+            borderColor: 0x9e1e63,
+            fontFamily: 'Georgia',
+            fontSize: 24,
+            fontColor: '#f0f0f0',
+            fontStyle: 'italic',
+            duration: 8000,
+            speakText: true,
+            speakOptions: {
+                rate: 0.8,
+                pitch: 0.9
+            },
+            autoDestroy: false
+        });
+        quoteCard.show(quote);
         
         // Create mirror illustration (placeholder)
         const mirror = this.add.rectangle(
@@ -261,6 +291,17 @@ class MenuScene extends Phaser.Scene {
                 align: 'center'
             }
         ).setOrigin(0.5);
+        
+        // Show a message card with text-to-speech
+        const creditsCard = new MessageCard(this, {
+            y: this.cameras.main.height / 2 + 80,
+            width: 400,
+            height: 60,
+            style: 'info',
+            duration: 6000,
+            speakText: true
+        });
+        creditsCard.show("Obrigado por jogar Juliette Psicose");
         
         const closeButton = this.add.text(
             this.cameras.main.width / 2,

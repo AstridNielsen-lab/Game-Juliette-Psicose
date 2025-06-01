@@ -23,6 +23,16 @@ class NameInputScene extends Phaser.Scene {
             0x000000
         );
         
+        // Show welcome message with text-to-speech
+        const welcomeCard = new MessageCard(this, {
+            y: 300,
+            height: 100,
+            style: 'info',
+            duration: 7000,
+            speakText: true
+        });
+        welcomeCard.show("Bem-vindo(a) ao experimento mental. Por favor, identifique-se para continuarmos.");
+        
         // Add smoke/fog effect similar to menu scene
         this.createSmokeEffect();
         
@@ -201,30 +211,23 @@ class NameInputScene extends Phaser.Scene {
                     "Não confie no sistema..."
                 ];
                 
-                const message = this.add.text(
-                    this.cameras.main.width / 2,
-                    600,
-                    Phaser.Utils.Array.GetRandom(creepyMessages),
-                    {
-                        font: '24px Georgia',
-                        fill: '#ff0000',
-                        fontStyle: 'italic'
-                    }
-                ).setOrigin(0.5).setAlpha(0);
-                
-                this.tweens.add({
-                    targets: message,
-                    alpha: 0.7,
-                    duration: 1000,
-                    yoyo: true,
-                    hold: 2000,
-                    onComplete: () => {
-                        message.destroy();
+                // Use MessageCard component with text-to-speech
+                const messageCard = new MessageCard(this, {
+                    y: 600,
+                    width: 550,
+                    height: 80,
+                    style: 'danger',
+                    glitchEffect: true,
+                    duration: 4000,
+                    speakText: true,
+                    speakOptions: {
+                        pitch: 0.8,  // Lower pitch for creepy effect
+                        rate: 0.9,   // Slower speech for emphasis
+                        volume: 0.9
                     }
                 });
                 
-                // Apply glitch effect
-                VisualEffects.applyGlitch(this, message, 1, 500);
+                messageCard.show(Phaser.Utils.Array.GetRandom(creepyMessages));
             },
             loop: true
         });

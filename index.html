@@ -28,6 +28,10 @@
                 <span class="icon">♪</span>
                 <span class="label">Música</span>
             </button>
+            <button id="voice-toggle" class="control-button">
+                <span class="icon">🔊</span>
+                <span class="label">Voz</span>
+            </button>
             <button id="fullscreen-toggle" class="control-button">
                 <span class="icon">⛶</span>
                 <span class="label">Tela Cheia</span>
@@ -36,6 +40,8 @@
     </div>
 
     <!-- Game Components -->
+    <script src="js/components/TextToSpeechManager.js"></script>
+    <script src="js/components/MessageCard.js"></script>
     <script src="js/components/PanicBot.js"></script>
     <script src="js/components/CountdownTimer.js"></script>
     
@@ -85,6 +91,28 @@
                         localStorage.setItem('juliettePsicose_musicOn', 'false');
                         if (window.gameState) window.gameState.musicOn = false;
                         if (window.gameMusic) window.gameMusic.muted = true;
+                    }
+                }
+            });
+            
+            // Voice toggle
+            const voiceToggle = document.getElementById('voice-toggle');
+            // Set initial state from localStorage
+            if (localStorage.getItem('juliettePsicose_ttsEnabled') === 'false') {
+                voiceToggle.classList.add('muted');
+            }
+            
+            voiceToggle.addEventListener('click', function() {
+                if (window.ttsManager) {
+                    const isEnabled = window.ttsManager.options.enabled;
+                    window.ttsManager.setEnabled(!isEnabled);
+                    
+                    if (!isEnabled) {
+                        voiceToggle.classList.remove('muted');
+                        localStorage.setItem('juliettePsicose_ttsEnabled', 'true');
+                    } else {
+                        voiceToggle.classList.add('muted');
+                        localStorage.setItem('juliettePsicose_ttsEnabled', 'false');
                     }
                 }
             });

@@ -201,6 +201,19 @@ class Chapter1Scene extends Phaser.Scene {
     
     // Timer challenge system
     startChallenge(duration = 30000, onComplete = null, onFail = null) {
+        // Display challenge start message with text-to-speech
+        const challengeCard = new MessageCard(this, {
+            y: 200,
+            style: 'warning',
+            duration: 3000,
+            speakText: true,
+            speakOptions: {
+                rate: 1.2,
+                pitch: 1.1
+            }
+        });
+        challengeCard.show("DESAFIO INICIADO! Complete a tarefa antes que o tempo acabe!");
+        
         // Create a countdown timer
         this.challengeTimer = new CountdownTimer(this, {
             duration: duration,
@@ -210,6 +223,19 @@ class Chapter1Scene extends Phaser.Scene {
                 
                 // Stop the panic bot
                 this.panicBot.stop();
+                
+                // Show failure message with text-to-speech
+                const failureCard = new MessageCard(this, {
+                    y: 200,
+                    style: 'danger',
+                    duration: 3000,
+                    speakText: true,
+                    speakOptions: {
+                        rate: 0.8,
+                        pitch: 0.7
+                    }
+                });
+                failureCard.show("FALHA! Seu tempo acabou...");
                 
                 // Save challenge result
                 const results = JSON.parse(localStorage.getItem('juliettePsicose_challengeResults') || '[]');
@@ -278,10 +304,59 @@ class Chapter1Scene extends Phaser.Scene {
     startIntroDialog() {
         // Setup the narrative dialog
         this.dialogSystem
-            .addDialog("Onde... onde estou?", "Juliette")
-            .addDialog("Minha cabeça dói. Estas paredes... este lugar...", "Juliette")
-            .addDialog("Você está no Asilo Santa Claridade. Você teve outro... episódio.", "Voz Desconhecida")
-            .addDialog("Não! Não foram alucinações. Eu vi a verdade! A corrupção, as mentiras!", "Juliette")
+            .addDialog("Onde... onde estou?", "Juliette", {
+                onShow: (text, speaker) => {
+                    // Show dialog in a card with text-to-speech
+                    const dialogCard = new MessageCard(this, {
+                        y: 150,
+                        style: 'info',
+                        duration: 4000,
+                        speakText: true
+                    });
+                    dialogCard.show(text);
+                }
+            })
+            .addDialog("Minha cabeça dói. Estas paredes... este lugar...", "Juliette", {
+                onShow: (text, speaker) => {
+                    const dialogCard = new MessageCard(this, {
+                        y: 150,
+                        style: 'info',
+                        duration: 4000,
+                        speakText: true
+                    });
+                    dialogCard.show(text);
+                }
+            })
+            .addDialog("Você está no Asilo Santa Claridade. Você teve outro... episódio.", "Voz Desconhecida", {
+                onShow: (text, speaker) => {
+                    const dialogCard = new MessageCard(this, {
+                        y: 150,
+                        style: 'warning',
+                        duration: 5000,
+                        speakText: true,
+                        speakOptions: {
+                            pitch: 0.7, // Lower pitch for mysterious voice
+                            rate: 0.85
+                        }
+                    });
+                    dialogCard.show(text);
+                }
+            })
+            .addDialog("Não! Não foram alucinações. Eu vi a verdade! A corrupção, as mentiras!", "Juliette", {
+                onShow: (text, speaker) => {
+                    const dialogCard = new MessageCard(this, {
+                        y: 150,
+                        style: 'danger',
+                        duration: 5000,
+                        speakText: true,
+                        speakOptions: {
+                            pitch: 1.1, // Higher pitch for agitation
+                            rate: 1.1
+                        }
+                    });
+                    dialogCard.show(text);
+                }
+            })
             .addChoice("O que devo fazer?", [
                 {
                     text: "Examinar o quarto cuidadosamente",
