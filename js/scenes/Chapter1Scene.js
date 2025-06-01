@@ -271,6 +271,142 @@ class Chapter1Scene extends Phaser.Scene {
     
     // Timer challenge system
     startChallenge(duration = 30000, onComplete = null, onFail = null) {
+        // First show explanation screen
+        this.showChallengeExplanation(() => {
+            // After explanation is acknowledged, start the actual challenge
+            this.startActualChallenge(duration, onComplete, onFail);
+        });
+    }
+    
+    // Show explanation screen before challenge
+    showChallengeExplanation(onContinue) {
+        // Create explanation container
+        const explanationContainer = this.add.container(this.cameras.main.width / 2, this.cameras.main.height / 2);
+        
+        // Background overlay
+        const overlay = this.add.rectangle(
+            0, 0,
+            this.cameras.main.width * 2,
+            this.cameras.main.height * 2,
+            0x000000, 0.7
+        );
+        overlay.setOrigin(0.5);
+        explanationContainer.add(overlay);
+        
+        // Explanation background
+        const explanationBg = this.add.rectangle(
+            0, 0,
+            this.cameras.main.width * 0.8,
+            this.cameras.main.height * 0.7,
+            0x1a1a1a, 0.9
+        );
+        explanationBg.setStrokeStyle(2, 0x9e1e63);
+        explanationBg.setOrigin(0.5);
+        explanationContainer.add(explanationBg);
+        
+        // Title text
+        const titleText = this.add.text(
+            0, -explanationBg.height / 2 + 50,
+            'Desafio de Percepção Extrassensorial',
+            {
+                fontFamily: 'Georgia',
+                fontSize: '32px',
+                color: '#9e1e63',
+                stroke: '#000000',
+                strokeThickness: 2
+            }
+        );
+        titleText.setOrigin(0.5);
+        explanationContainer.add(titleText);
+        
+        // Explanation text
+        const explanationText = this.add.text(
+            0, -50,
+            'Neste desafio, você testará sua capacidade de percepção além dos sentidos normais.\n\nVocê precisará confiar em sua intuição e sensibilidade para detectar padrões ocultos e energias que não são perceptíveis pelos meios convencionais.',
+            {
+                fontFamily: 'Georgia',
+                fontSize: '20px',
+                color: '#f0f0f0',
+                align: 'center',
+                wordWrap: { width: explanationBg.width - 100 }
+            }
+        );
+        explanationText.setOrigin(0.5);
+        explanationContainer.add(explanationText);
+        
+        // Instructions text
+        const instructionsText = this.add.text(
+            0, 80,
+            'Complete o desafio antes que o tempo acabe. Quanto melhor seu desempenho, maior será a recompensa em karma e revelações sobre a história.',
+            {
+                fontFamily: 'Georgia',
+                fontSize: '18px',
+                color: '#b39ddb',
+                align: 'center',
+                wordWrap: { width: explanationBg.width - 150 }
+            }
+        );
+        instructionsText.setOrigin(0.5);
+        explanationContainer.add(instructionsText);
+        
+        // Continue button
+        const continueButton = this.add.rectangle(
+            0, explanationBg.height / 2 - 80,
+            200,
+            50,
+            0x9e1e63
+        );
+        continueButton.setInteractive({ useHandCursor: true });
+        explanationContainer.add(continueButton);
+        
+        // Continue button text
+        const continueText = this.add.text(
+            0, explanationBg.height / 2 - 80,
+            'Continuar',
+            {
+                fontFamily: 'Georgia',
+                fontSize: '20px',
+                color: '#ffffff'
+            }
+        );
+        continueText.setOrigin(0.5);
+        explanationContainer.add(continueText);
+        
+        // Add click handler to continue button
+        continueButton.on('pointerdown', () => {
+            // Fade out explanation screen
+            this.tweens.add({
+                targets: explanationContainer,
+                alpha: 0,
+                duration: 500,
+                onComplete: () => {
+                    // Clean up
+                    explanationContainer.destroy();
+                    
+                    // Call continue callback
+                    if (onContinue) {
+                        onContinue();
+                    }
+                }
+            });
+        });
+        
+        // Fade in explanation screen
+        explanationContainer.setAlpha(0);
+        this.tweens.add({
+            targets: explanationContainer,
+            alpha: 1,
+            duration: 500
+        });
+        
+        // Text-to-speech for accessibility
+        if (window.ttsManager) {
+            window.ttsManager.speak("Desafio de Percepção Extrassensorial. " + explanationText.text);
+        }
+    }
+    
+    // Start the actual challenge timer after explanation
+    startActualChallenge(duration = 30000, onComplete = null, onFail = null) {
         // Display challenge start message with text-to-speech
         const challengeCard = new MessageCard(this, {
             y: 200,
@@ -369,6 +505,40 @@ class Chapter1Scene extends Phaser.Scene {
             timer: this.challengeTimer,
             complete: this.completeChallenge
         };
+    }
+    
+    // Initialize ESP challenge
+    startESPChallenge(type = 'zener', onComplete = null) {
+        // Initialize ESP challenge system if not already
+        if (!this.espChallengeSystem) {
+            this.espChallengeSystem = new ESPChallengeSystem(this, {
+                onComplete: (result) => {
+                    // Handle ESP challenge completion
+                    console.log('ESP challenge completed:', result);
+                    
+                    // Call onComplete callback if provided
+                    if (onComplete) {
+                        onComplete(result);
+                    }
+                }
+            });
+        }
+        
+        // Start appropriate ESP challenge
+        switch (type) {
+            case 'zener':
+                this.espChallengeSystem.startZenerCardTest();
+                break;
+            case 'precognition':
+                this.espChallengeSystem.startPrecognitionTest();
+                break;
+            case 'remoteViewing':
+                this.espChallengeSystem.startRemoteViewingTest();
+                break;
+            case 'emotionalReading':
+                this.espChallengeSystem.startEmotionalReadingTest();
+                break;
+        }
     }
     
     startIntroDialog() {
@@ -503,6 +673,13 @@ class Chapter1Scene extends Phaser.Scene {
                 // Challenge completed successfully - will be called by completeChallenge()
                 console.log('Mirror challenge completed with ' + timeLeft + 'ms remaining');
                 gameState.karma += 2; // Bonus for completing quickly
+                
+                // After mirror challenge, start ESP challenge
+                this.time.delayedCall(3000, () => {
+                    this.startESPChallenge('zener', (result) => {
+                        console.log('ESP challenge result:', result);
+                    });
+                });
             }, 
             () => {
                 // Challenge failed - timer ran out
@@ -757,6 +934,13 @@ class Chapter1Scene extends Phaser.Scene {
                     // Door opened successfully
                     console.log('Door escape completed with ' + timeLeft + 'ms remaining');
                     gameState.karma += 1; // Bonus for quick escape
+                    
+                    // After door challenge, start precognition ESP challenge
+                    this.time.delayedCall(3000, () => {
+                        this.startESPChallenge('precognition', (result) => {
+                            console.log('Precognition challenge result:', result);
+                        });
+                    });
                 }, 
                 () => {
                     // Failed to escape in time
@@ -865,6 +1049,11 @@ class Chapter1Scene extends Phaser.Scene {
         // Update tarot system if active
         if (this.tarotSystem) {
             this.tarotSystem.update();
+        }
+        
+        // Update ESP challenge system if active
+        if (this.espChallengeSystem && this.espChallengeSystem.isActive) {
+            this.espChallengeSystem.update();
         }
     }
     
