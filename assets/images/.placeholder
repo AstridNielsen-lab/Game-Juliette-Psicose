@@ -1,0 +1,3 @@
+This file ensures the images directory is created in Git repositories.
+The actual image files should be placed in the appropriate subdirectories.
+
