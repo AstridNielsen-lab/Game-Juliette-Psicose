@@ -40,10 +40,12 @@
     </div>
 
     <!-- Game Components -->
+    <script src="js/components/AudioManager.js"></script>
     <script src="js/components/TextToSpeechManager.js"></script>
     <script src="js/components/MessageCard.js"></script>
     <script src="js/components/PanicBot.js"></script>
     <script src="js/components/CountdownTimer.js"></script>
+    <script src="js/components/TarotSystem.js"></script>
     <script src="js/components/AIChat.js"></script>
     
     <!-- Game Scenes -->
@@ -80,19 +82,27 @@
             // Music toggle
             const musicToggle = document.getElementById('music-toggle');
             musicToggle.addEventListener('click', function() {
-                if (window.game && window.game.sound) {
-                    if (window.game.sound.mute) {
-                        window.game.sound.mute = false;
-                        musicToggle.classList.remove('muted');
-                        localStorage.setItem('juliettePsicose_musicOn', 'true');
-                        if (window.gameState) window.gameState.musicOn = true;
-                        if (window.gameMusic) window.gameMusic.muted = false;
-                    } else {
-                        window.game.sound.mute = true;
-                        musicToggle.classList.add('muted');
-                        localStorage.setItem('juliettePsicose_musicOn', 'false');
-                        if (window.gameState) window.gameState.musicOn = false;
-                        if (window.gameMusic) window.gameMusic.muted = true;
+                const isMuted = localStorage.getItem('juliettePsicose_musicOn') === 'false';
+                const newMutedState = !isMuted;
+                
+                // Update localStorage and UI
+                localStorage.setItem('juliettePsicose_musicOn', !newMutedState);
+                if (newMutedState) {
+                    musicToggle.classList.add('muted');
+                } else {
+                    musicToggle.classList.remove('muted');
+                }
+                
+                // Update game state
+                if (window.gameState) window.gameState.musicOn = !newMutedState;
+                
+                // Update any active scene's audio manager
+                if (window.game && window.game.scene) {
+                    const activeScenes = window.game.scene.scenes;
+                    for (const scene of activeScenes) {
+                        if (scene.audioManager) {
+                            scene.audioManager.setMute(newMutedState);
+                        }
                     }
                 }
             });

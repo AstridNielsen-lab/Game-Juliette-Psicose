@@ -15,9 +15,46 @@ class Chapter1Scene extends Phaser.Scene {
         this.load.image('key', 'assets/images/key.png');
         
         // Load audio
-        this.load.audio('chapter1-music', 'assets/audio/chapter1-theme.mp3');
-        this.load.audio('heartbeat', 'assets/audio/heartbeat.mp3');
-        this.load.audio('glass-break', 'assets/audio/glass-break.mp3');
+        this.load.audio('main_theme', 'assets/audio/main_theme.mp3');
+        this.load.audio('dark_electronic', 'assets/audio/dark_electronic.mp3');
+        this.load.audio('twisted_jazz', 'assets/audio/twisted_jazz.mp3');
+        this.load.audio('rebellion_theme', 'assets/audio/rebellion_theme.mp3');
+        
+        // Load tarot card assets
+        this.load.image('tarot-back', 'assets/images/tarot/card-back.png');
+        this.load.image('tarot-justice', 'assets/images/tarot/justice.png');
+        this.load.image('tarot-rebellion', 'assets/images/tarot/rebellion.png');
+        this.load.image('tarot-love', 'assets/images/tarot/love.png');
+        this.load.image('tarot-moon', 'assets/images/tarot/moon.png');
+        
+        // Load tarot sounds
+        this.load.audio('tarot-shuffle', 'assets/audio/tarot/shuffle.mp3');
+        this.load.audio('tarot-flip', 'assets/audio/tarot/flip.mp3');
+        this.load.audio('tarot-select', 'assets/audio/tarot/select.mp3');
+        this.load.audio('tarot-reveal', 'assets/audio/tarot/reveal.mp3');
+        this.load.audio('tarot-justice', 'assets/audio/tarot/justice.mp3');
+        this.load.audio('tarot-rebellion', 'assets/audio/tarot/rebellion.mp3');
+        this.load.audio('tarot-love', 'assets/audio/tarot/love.mp3');
+        this.load.audio('tarot-moon', 'assets/audio/tarot/moon.mp3');
+        
+        this.load.audio('juliette_theme', 'assets/audio/juliette_theme.mp3');
+        this.load.audio('mirror_theme', 'assets/audio/mirror_theme.mp3');
+        this.load.audio('asylum_ambience', 'assets/audio/asylum_ambience.mp3');
+        
+        // Load sound effects - glass breaks
+        this.load.audio('glass_break_1', 'assets/audio/glass_break/break_1.mp3');
+        this.load.audio('glass_break_2', 'assets/audio/glass_break/break_2.mp3');
+        this.load.audio('glass_crack', 'assets/audio/glass_break/crack.mp3');
+        
+        // Load sound effects - glitch sounds
+        this.load.audio('glitch_1', 'assets/audio/glitch/glitch_1.mp3');
+        this.load.audio('glitch_2', 'assets/audio/glitch/glitch_2.mp3');
+        this.load.audio('static', 'assets/audio/glitch/static.mp3');
+        
+        // Load sound effects - ambient
+        this.load.audio('heartbeat', 'assets/audio/ambient/heartbeat.mp3');
+        this.load.audio('whispers', 'assets/audio/ambient/whispers.mp3');
+        this.load.audio('footsteps', 'assets/audio/ambient/footsteps.mp3');
         
         // Load dialog box assets
         this.load.image('dialog-box', 'assets/images/dialog-box.png');
@@ -45,6 +82,35 @@ class Chapter1Scene extends Phaser.Scene {
         
         // Initialize dialog system
         this.dialogSystem = new DialogSystem(this);
+        
+        // Initialize audio manager
+        this.audioManager = new AudioManager(this);
+        this.audioManager.initialize();
+        
+        // Initialize tarot system
+        this.tarotSystem = new TarotSystem(this, {
+            scale: 0.9,
+            cardScale: 0.7,
+            glitchIntensity: 0.6,
+            onCardSelected: (card, index) => {
+                console.log(`Card selected: ${card.cardData.name}`);
+                // Apply effects based on the selected card
+                if (card.key === 'justice') {
+                    // Justice card effects
+                    VisualEffects.applyVignette(this, 0.6);
+                } else if (card.key === 'rebellion') {
+                    // Rebellion card effects
+                    this.audioManager.applyGlitchEffect(0.8, 1000);
+                } else if (card.key === 'moon') {
+                    // Moon card effects
+                    VisualEffects.applyFilter(this, 'blur', 0.5);
+                }
+            },
+            onReadingComplete: (reading) => {
+                console.log(`Reading complete: ${reading.type}`);
+                // Handle narrative progression based on reading
+            }
+        });
         
         // Create panic bot for anxiety-inducing messages
         this.panicBot = new PanicBot(this, {
@@ -177,7 +243,11 @@ class Chapter1Scene extends Phaser.Scene {
         this.setupInteractions();
         
         // Start background sounds
-        // this.sound.play('chapter1-music', { loop: true, volume: 0.3 });
+        this.audioManager.playMusic('asylum_ambience', {
+            volume: 0.3,
+            fadeIn: true,
+            fadeInDuration: 3000
+        });
         
         // For game state tracking
         this.mirrorInspected = false;
@@ -419,8 +489,13 @@ class Chapter1Scene extends Phaser.Scene {
         
         this.mirrorInspected = true;
         
-        // Play sound effect
-        // this.sound.play('heartbeat', { volume: 0.5 });
+        // Play sound effects
+        this.audioManager.playSoundEffect('heartbeat', { volume: 0.5 });
+        this.audioManager.playMusic('mirror_theme', {
+            volume: 0.4,
+            crossFade: true,
+            fadeInDuration: 1500
+        });
         
         // Start a challenge timer for the mirror puzzle
         this.mirrorChallenge = this.startChallenge(45000, 
@@ -440,8 +515,10 @@ class Chapter1Scene extends Phaser.Scene {
             }
         );
         
-        // Apply glitch effect to mirror
+        // Apply glitch effect to mirror and audio
         VisualEffects.applyGlitch(this, this.roomContainer.getByName('mirror'), 2, 1500);
+        this.audioManager.applyGlitchEffect(0.7, 1500);
+        this.audioManager.playSoundEffect('glitch_1', { volume: 0.4 });
         
         // Mirror dialog
         this.dialogSystem
@@ -529,7 +606,25 @@ class Chapter1Scene extends Phaser.Scene {
     
     giveKey() {
         // Play glass breaking sound
-        // this.sound.play('glass-break', { volume: 0.7 });
+        this.audioManager.playSoundEffect('glass_break_1', { volume: 0.7 });
+        this.audioManager.playSoundEffect('glass_crack', { 
+            volume: 0.5,
+            rate: 0.8,
+            delay: 100
+        });
+        
+        // After breaking the mirror, trigger a tarot reading as a mystical experience
+        this.time.delayedCall(2000, () => {
+            // Add dialogue before tarot reading
+            this.dialogSystem
+                .addDialog("*Um estranho baralho de cartas cai junto com os estilhaços do espelho*")
+                .addDialog("Estas cartas... parecem querer me dizer algo.", "Juliette")
+                .onDialogComplete(() => {
+                    // Start a single card reading
+                    this.startTarotReading('single');
+                })
+                .start();
+        });
         
         // Show key animation
         const key = this.add.rectangle(
@@ -639,6 +734,23 @@ class Chapter1Scene extends Phaser.Scene {
                 .addDialog("Ainda está trancada. Preciso encontrar a chave.", "Juliette")
                 .start();
         } else {
+            // Play suspenseful music
+            this.audioManager.playMusic('rebellion_theme', {
+                volume: 0.6,
+                crossFade: true,
+                fadeInDuration: 1000
+            });
+            
+            // Before the escape attempt, do a three-card reading
+            this.dialogSystem
+                .addDialog("*Antes de tentar fugir, você sente uma compulsão para consultar as cartas*")
+                .addDialog("Preciso saber o que me aguarda além desta porta.", "Juliette")
+                .onDialogComplete(() => {
+                    // Start a three card reading
+                    this.startTarotReading('three');
+                })
+                .start();
+            
             // Start a door escape challenge
             const doorChallenge = this.startChallenge(30000, 
                 (timeLeft) => {
@@ -740,6 +852,65 @@ class Chapter1Scene extends Phaser.Scene {
     
     update() {
         // Game update loop - would handle animations, movement, etc.
+        
+        // Audio visualization could be implemented here
+        if (this.audioManager) {
+            const audioData = this.audioManager.getAudioData();
+            if (audioData) {
+                // Use audio data for visualizations, if needed
+                // For example, you could make objects pulse to the beat
+            }
+        }
+        
+        // Update tarot system if active
+        if (this.tarotSystem) {
+            this.tarotSystem.update();
+        }
+    }
+    
+    // Add tarot reading interaction
+    startTarotReading(type = 'single') {
+        // First check if player has enough karma
+        if (window.gameState && window.gameState.karma < -2) {
+            // Player has negative karma, show warning
+            const warningCard = new MessageCard(this, {
+                y: 150,
+                style: 'warning',
+                duration: 4000,
+                speakText: true
+            });
+            warningCard.show("As cartas recusam seu toque. Sua alma está desequilibrada.");
+            return;
+        }
+        
+        // Apply ambiance change
+        if (this.audioManager) {
+            this.audioManager.playMusic('dark_electronic', {
+                volume: 0.4,
+                crossFade: true,
+                fadeInDuration: 2000
+            });
+        }
+        
+        // Determine reading type based on narrative context
+        let readingOptions = {};
+        
+        if (type === 'single') {
+            this.tarotSystem.startSingleCardReading({
+                title: 'A Carta do Destino',
+                instruction: 'Clique na carta para revelar seu significado'
+            });
+        } else if (type === 'three') {
+            this.tarotSystem.startThreeCardReading({
+                title: 'Passado • Presente • Futuro',
+                instruction: 'Clique nas cartas para revelar sua jornada'
+            });
+        } else if (type === 'cross') {
+            this.tarotSystem.startCrossReading({
+                title: 'A Encruzilhada do Destino',
+                instruction: 'As cartas revelarão seu caminho na escuridão'
+            });
+        }
     }
 }
 

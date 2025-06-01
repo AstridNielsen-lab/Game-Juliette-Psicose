@@ -47,32 +47,11 @@ window.addEventListener('load', function() {
         }
     });
     
-    // Load game background music
-    const loadBackgroundMusic = () => {
-        // A haunting soundtrack from Pixabay
-        const bgMusic = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_38c2bf3899.mp3');
-        bgMusic.loop = true;
-        bgMusic.volume = 0.4;
-        
-        // Set up music controls
-        window.gameMusic = bgMusic;
-        
-        // Check if music should be muted based on localStorage
-        if (localStorage.getItem('juliettePsicose_musicOn') === 'false') {
-            bgMusic.muted = true;
-            document.getElementById('music-toggle').classList.add('muted');
-        } else {
-            // Start playing when user interacts with the page
-            const startMusic = () => {
-                bgMusic.play().catch(e => console.log('Audio playback error:', e));
-                document.removeEventListener('click', startMusic);
-            };
-            document.addEventListener('click', startMusic);
-        }
-    };
-    
-    // Load game music
-    loadBackgroundMusic();
+    // Audio will be handled by the AudioManager component in each scene
+    // Update UI for mute button based on localStorage
+    if (localStorage.getItem('juliettePsicose_musicOn') === 'false') {
+        document.getElementById('music-toggle').classList.add('muted');
+    }
     
     // Wait for font loading (simulated)
     setTimeout(() => {
@@ -80,9 +59,7 @@ window.addEventListener('load', function() {
         window.gameState = gameState;
         
         // Apply music setting from localStorage
-        if (window.game && window.game.sound) {
-            window.game.sound.mute = localStorage.getItem('juliettePsicose_musicOn') === 'false';
-        }
+        // Audio settings will be managed by AudioManager component
     }, 2500); // Delayed to ensure loading screen is shown
 });
 
