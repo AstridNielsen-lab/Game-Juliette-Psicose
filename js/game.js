@@ -11,7 +11,7 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [MenuScene, Chapter1Scene],
+    scene: [NameInputScene, MenuScene, Chapter1Scene],
     physics: {
         default: 'arcade',
         arcade: {
@@ -24,20 +24,54 @@ const config = {
 // Game variables
 const gameState = {
     choices: [],
-    playerName: 'Juliette',
+    playerName: localStorage.getItem('juliettePsicose_playerName') || 'Juliette',
     chapter: 1,
     karma: 0, // Positive values = good karma, negative = bad karma
     collectibles: [],
     currentEpisode: 'Visão da Injustiça',
-    musicOn: true
+    musicOn: localStorage.getItem('juliettePsicose_musicOn') !== 'false', // Default to true
+    lastSaveTime: localStorage.getItem('juliettePsicose_lastSaveTime') || null,
+    challengeResults: JSON.parse(localStorage.getItem('juliettePsicose_challengeResults') || '[]')
 };
 
 // Initialize the game
 window.addEventListener('load', function() {
+    // Load game background music
+    const loadBackgroundMusic = () => {
+        // A haunting soundtrack from Pixabay
+        const bgMusic = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_38c2bf3899.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.4;
+        
+        // Set up music controls
+        window.gameMusic = bgMusic;
+        
+        // Check if music should be muted based on localStorage
+        if (localStorage.getItem('juliettePsicose_musicOn') === 'false') {
+            bgMusic.muted = true;
+            document.getElementById('music-toggle').classList.add('muted');
+        } else {
+            // Start playing when user interacts with the page
+            const startMusic = () => {
+                bgMusic.play().catch(e => console.log('Audio playback error:', e));
+                document.removeEventListener('click', startMusic);
+            };
+            document.addEventListener('click', startMusic);
+        }
+    };
+    
+    // Load game music
+    loadBackgroundMusic();
+    
     // Wait for font loading (simulated)
     setTimeout(() => {
         window.game = new Phaser.Game(config);
         window.gameState = gameState;
+        
+        // Apply music setting from localStorage
+        if (window.game && window.game.sound) {
+            window.game.sound.mute = localStorage.getItem('juliettePsicose_musicOn') === 'false';
+        }
     }, 2500); // Delayed to ensure loading screen is shown
 });
 

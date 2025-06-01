@@ -46,6 +46,14 @@ class Chapter1Scene extends Phaser.Scene {
         // Initialize dialog system
         this.dialogSystem = new DialogSystem(this);
         
+        // Create panic bot for anxiety-inducing messages
+        this.panicBot = new PanicBot(this, {
+            minDelay: 8000,
+            maxDelay: 15000,
+            messageY: 150,
+            enabled: false // Start disabled, will enable during challenges
+        });
+        
         // Create background (placeholder in this demo)
         const bg = this.add.rectangle(
             this.cameras.main.width / 2,
@@ -191,6 +199,82 @@ class Chapter1Scene extends Phaser.Scene {
         });
     }
     
+    // Timer challenge system
+    startChallenge(duration = 30000, onComplete = null, onFail = null) {
+        // Create a countdown timer
+        this.challengeTimer = new CountdownTimer(this, {
+            duration: duration,
+            onComplete: () => {
+                // Time's up - challenge failed
+                if (onFail) onFail();
+                
+                // Stop the panic bot
+                this.panicBot.stop();
+                
+                // Save challenge result
+                const results = JSON.parse(localStorage.getItem('juliettePsicose_challengeResults') || '[]');
+                results.push({
+                    challenge: gameState.currentEpisode,
+                    timestamp: new Date().toISOString(),
+                    success: false,
+                    timeLeft: 0
+                });
+                localStorage.setItem('juliettePsicose_challengeResults', JSON.stringify(results));
+            },
+            warningThreshold: 0.6,
+            criticalThreshold: 0.3,
+            pulse: true
+        });
+        
+        // Activate the panic bot with increasing intensity
+        this.panicBot.start();
+        
+        // Increase panic as time goes on
+        const intensityTimer = this.time.addEvent({
+            delay: duration / 10,
+            callback: () => {
+                const timeLeft = this.challengeTimer.getRemainingTime();
+                const intensity = 1 - (timeLeft / duration);
+                this.panicBot.setIntensity(intensity);
+            },
+            repeat: 9
+        });
+        
+        // Method to complete the challenge
+        this.completeChallenge = () => {
+            // Get remaining time
+            const timeLeft = this.challengeTimer.getRemainingTime();
+            
+            // Stop the timer
+            this.challengeTimer.pause();
+            this.challengeTimer.destroy();
+            
+            // Stop the panic bot
+            this.panicBot.stop();
+            
+            // Clean up
+            intensityTimer.remove();
+            
+            // Save challenge result
+            const results = JSON.parse(localStorage.getItem('juliettePsicose_challengeResults') || '[]');
+            results.push({
+                challenge: gameState.currentEpisode,
+                timestamp: new Date().toISOString(),
+                success: true,
+                timeLeft: timeLeft
+            });
+            localStorage.setItem('juliettePsicose_challengeResults', JSON.stringify(results));
+            
+            // Call success callback
+            if (onComplete) onComplete(timeLeft);
+        };
+        
+        return {
+            timer: this.challengeTimer,
+            complete: this.completeChallenge
+        };
+    }
+    
     startIntroDialog() {
         // Setup the narrative dialog
         this.dialogSystem
@@ -263,6 +347,24 @@ class Chapter1Scene extends Phaser.Scene {
         // Play sound effect
         // this.sound.play('heartbeat', { volume: 0.5 });
         
+        // Start a challenge timer for the mirror puzzle
+        this.mirrorChallenge = this.startChallenge(45000, 
+            (timeLeft) => {
+                // Challenge completed successfully - will be called by completeChallenge()
+                console.log('Mirror challenge completed with ' + timeLeft + 'ms remaining');
+                gameState.karma += 2; // Bonus for completing quickly
+            }, 
+            () => {
+                // Challenge failed - timer ran out
+                console.log('Mirror challenge failed');
+                gameState.karma -= 1;
+                this.dialogSystem
+                    .addDialog("*Você demorou demais para reagir*")
+                    .addDialog("*O reflexo desaparece, deixando apenas um vislumbre de desapontamento*")
+                    .start();
+            }
+        );
+        
         // Apply glitch effect to mirror
         VisualEffects.applyGlitch(this, this.roomContainer.getByName('mirror'), 2, 1500);
         
@@ -322,6 +424,10 @@ class Chapter1Scene extends Phaser.Scene {
                             
                         this.time.delayedCall(1500, () => {
                             this.giveKey();
+                            // Complete the challenge
+                            if (this.mirrorChallenge && this.completeChallenge) {
+                                this.completeChallenge();
+                            }
                         });
                     }
                 },
@@ -458,6 +564,29 @@ class Chapter1Scene extends Phaser.Scene {
                 .addDialog("Ainda está trancada. Preciso encontrar a chave.", "Juliette")
                 .start();
         } else {
+            // Start a door escape challenge
+            const doorChallenge = this.startChallenge(30000, 
+                (timeLeft) => {
+                    // Door opened successfully
+                    console.log('Door escape completed with ' + timeLeft + 'ms remaining');
+                    gameState.karma += 1; // Bonus for quick escape
+                }, 
+                () => {
+                    // Failed to escape in time
+                    console.log('Door escape failed');
+                    gameState.karma -= 2;
+                    this.dialogSystem
+                        .addDialog("*A fechadura parece ter travado novamente*")
+                        .addDialog("*Você ouve passos se aproximando no corredor*")
+                        .addDialog("Não! Preciso tentar de novo, rápido!", "Juliette")
+                        .onDialogComplete(() => {
+                            // Give player another chance
+                            this.hasKey = true; // Keep the key
+                        })
+                        .start();
+                }
+            );
+            
             // Have the key, can open the door
             this.dialogSystem
                 .addDialog("*Você insere a chave na fechadura*")
@@ -465,6 +594,10 @@ class Chapter1Scene extends Phaser.Scene {
                 .addDialog("Agora posso sair daqui e descobrir o que está acontecendo.")
                 .addDialog("*Ao abrir a porta, uma luz brilhante inunda o quarto*")
                 .onDialogComplete(() => {
+                    // Complete the challenge
+                    if (doorChallenge && this.completeChallenge) {
+                        this.completeChallenge();
+                    }
                     this.completeChapter();
                 })
                 .start();

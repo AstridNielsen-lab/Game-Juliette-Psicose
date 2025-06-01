@@ -35,7 +35,12 @@
         </div>
     </div>
 
-    <!-- Game Scripts -->
+    <!-- Game Components -->
+    <script src="js/components/PanicBot.js"></script>
+    <script src="js/components/CountdownTimer.js"></script>
+    
+    <!-- Game Scenes -->
+    <script src="js/scenes/NameInputScene.js"></script>
     <script src="js/scenes/MenuScene.js"></script>
     <script src="js/scenes/Chapter1Scene.js"></script>
     <script src="js/game.js"></script>
@@ -71,9 +76,15 @@
                     if (window.game.sound.mute) {
                         window.game.sound.mute = false;
                         musicToggle.classList.remove('muted');
+                        localStorage.setItem('juliettePsicose_musicOn', 'true');
+                        if (window.gameState) window.gameState.musicOn = true;
+                        if (window.gameMusic) window.gameMusic.muted = false;
                     } else {
                         window.game.sound.mute = true;
                         musicToggle.classList.add('muted');
+                        localStorage.setItem('juliettePsicose_musicOn', 'false');
+                        if (window.gameState) window.gameState.musicOn = false;
+                        if (window.gameMusic) window.gameMusic.muted = true;
                     }
                 }
             });
